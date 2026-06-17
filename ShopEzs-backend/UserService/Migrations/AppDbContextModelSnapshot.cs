@@ -1,0 +1,38 @@
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
+using UserService.Data;
+
+#nullable disable
+
+namespace UserService.Migrations;
+
+[DbContext(typeof(AppDbContext))]
+partial class AppDbContextModelSnapshot : ModelSnapshot
+{
+    protected override void BuildModel(ModelBuilder modelBuilder)
+    {
+#pragma warning disable 612, 618
+        modelBuilder
+            .HasAnnotation("ProductVersion", "8.0.0")
+            .HasAnnotation("Relational:MaxIdentifierLength", 128);
+
+        SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+
+        modelBuilder.Entity("UserService.Models.User", b =>
+        {
+            b.Property<int>("Id").ValueGeneratedOnAdd()
+                .HasColumnType("int");
+            SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+            b.Property<string>("Email").IsRequired().HasMaxLength(200).HasColumnType("nvarchar(200)");
+            b.Property<string>("Name").IsRequired().HasMaxLength(100).HasColumnType("nvarchar(100)");
+            b.Property<string>("Password").IsRequired().HasColumnType("nvarchar(max)");
+            b.Property<string>("Role").IsRequired().HasDefaultValue("User").HasColumnType("nvarchar(max)");
+
+            b.HasKey("Id");
+            b.HasIndex("Email").IsUnique();
+            b.ToTable("Users");
+        });
+#pragma warning restore 612, 618
+    }
+}

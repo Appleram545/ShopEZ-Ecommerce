@@ -1,0 +1,91 @@
+<div class="page">
+  <div class="hero">
+    <h1>Get In Touch</h1>
+    <p>We respond within 24 hours.</p>
+  </div>
+
+  <div class="layout">
+    <div class="info">
+      <h2>Contact Info</h2>
+      <div class="info-item">📍 ShopEZ HQ, Hitech City, Hyderabad 500081</div>
+      <div class="info-item">📞 +91 98765 43210 (Mon–Sat, 9am–6pm)</div>
+      <div class="info-item">✉️ support&#64;shopez.com</div>
+      <div class="info-item">⏰ Mon–Fri: 9am–8pm | Sat: 10am–5pm</div>
+    </div>
+
+    <div class="form-card">
+      <div class="success" *ngIf="sent">
+        <div>🎉</div>
+        <h2>Message Sent!</h2>
+        <p>We'll get back to you within 24 hours.</p>
+        <button (click)="sent = false; form.reset()">Send Another</button>
+      </div>
+      <form [formGroup]="form" (ngSubmit)="submit()" *ngIf="!sent">
+        <h2>Send a Message</h2>
+        <div class="row2">
+          <div class="field">
+            <label>Name</label
+            ><input formControlName="name" placeholder="Ram" /><span
+              class="err"
+              *ngIf="form.get('name')?.invalid && form.get('name')?.touched"
+              >Required</span
+            >
+          </div>
+          <div class="field">
+            <label>Email</label
+            ><input
+              type="email"
+              formControlName="email"
+              placeholder="ram@email.com"
+            /><span
+              class="err"
+              *ngIf="form.get('email')?.invalid && form.get('email')?.touched"
+              >Valid email required</span
+            >
+          </div>
+        </div>
+        <div class="field">
+          <label>Subject</label>
+          <select formControlName="subject">
+            <option value="">Select...</option>
+            <option>Order Issue</option>
+            <option>Return & Refund</option>
+            <option>Product Query</option>
+            <option>Other</option>
+          </select>
+          <span
+            class="err"
+            *ngIf="form.get('subject')?.invalid && form.get('subject')?.touched"
+            >Required</span
+          >
+        </div>
+        <div class="field">
+          <label>Message</label
+          ><textarea
+            formControlName="message"
+            rows="5"
+            placeholder="Min 20 characters..."
+          ></textarea
+          ><span
+            class="err"
+            *ngIf="form.get('message')?.invalid && form.get('message')?.touched"
+            >Min 20 characters</span
+          >
+        </div>
+        <button type="submit" [disabled]="loading">
+          {{ loading ? "Sending..." : "Send Message 📨" }}
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <div class="faqs">
+    <h2>Frequently Asked Questions</h2>
+    <div class="faq-grid">
+      <div class="faq" *ngFor="let f of faqs">
+        <h4>{{ f.q }}</h4>
+        <p>{{ f.a }}</p>
+      </div>
+    </div>
+  </div>
+</div>

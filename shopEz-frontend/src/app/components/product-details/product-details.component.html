@@ -1,0 +1,60 @@
+<div class="details-page" *ngIf="product; else loading">
+  <button class="back-btn" (click)="goBack()">← Back to Products</button>
+
+  <div class="details-card">
+    <div class="details-img-section">
+      <img [src]="product.imageUrl" [alt]="product.name" class="details-img" />
+      <span class="details-category">{{ product.category }}</span>
+    </div>
+
+    <div class="details-info">
+      <h1 class="details-name">{{ product.name }}</h1>
+      <p class="details-desc">{{ product?.desc }}</p>
+
+      <div class="details-price-row">
+        <span class="details-price">₹{{ product.price | number }}</span>
+        <span class="stock-info" [class.out]="product.stock === 0">
+          {{ product.stock > 0 ? product.stock + " in stock" : "Out of Stock" }}
+        </span>
+      </div>
+
+      <div class="quantity-row" *ngIf="product.stock > 0">
+        <label>Quantity:</label>
+        <div class="qty-controls">
+          <button (click)="quantity = quantity > 1 ? quantity - 1 : 1">
+            −
+          </button>
+          <span>{{ quantity }}</span>
+          <button
+            (click)="
+              quantity = quantity < product.stock ? quantity + 1 : quantity
+            "
+          >
+            +
+          </button>
+        </div>
+      </div>
+
+      <button
+        class="add-btn"
+        [class.added]="added"
+        (click)="addToCart()"
+        [disabled]="product.stock === 0"
+      >
+        {{ added ? "✓ Added to Cart!" : "🛒 Add to Cart" }}
+      </button>
+
+      <div class="details-meta">
+        <div><strong>Category:</strong> {{ product.category }}</div>
+        <div><strong>SKU:</strong> PROD-{{ product.id | number: "4.0-0" }}</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<ng-template #loading>
+  <div class="loading-state">
+    <div class="spinner"></div>
+    <p>Loading product...</p>
+  </div>
+</ng-template>

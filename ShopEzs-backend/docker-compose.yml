@@ -1,0 +1,112 @@
+services:
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    platform: linux/amd64
+    container_name: shopez-db
+    environment:
+      SA_PASSWORD: "StrongPass@123"
+      ACCEPT_EULA: "Y"
+      MSSQL_MEMORY_LIMIT_MB: "1024"
+    ports:
+      - "1433:1433"
+    volumes:
+      - sqldata:/var/opt/mssql
+    networks:
+      - shopez-net
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P 'StrongPass@123' -Q 'SELECT 1' -b -No"]
+      interval: 15s
+      timeout: 15s
+      retries: 20
+      start_period: 90s
+
+  user-service:
+    build: ./UserService
+    container_name: user-service
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultConnection=Server=sqlserver,1433;User Id=sa;Password=StrongPass@123;Database=ShopEz_Users;TrustServerCertificate=True
+      - Jwt__Key=9hkfm5q5Mmm/NfwIochtigQrbVOMBsPjw0mhXvbJv0M=
+      - Jwt__Issuer=ShopEz
+      - Jwt__Audience=ShopEzUsers
+    ports:
+      - "5001:8080"
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+    networks:
+      - shopez-net
+
+  product-service:
+    build: ./ProductService
+    container_name: product-service
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultConnection=Server=sqlserver,1433;User Id=sa;Password=StrongPass@123;Database=ShopEz_Products;TrustServerCertificate=True
+      - Jwt__Key=9hkfm5q5Mmm/NfwIochtigQrbVOMBsPjw0mhXvbJv0M=
+      - Jwt__Issuer=ShopEz
+      - Jwt__Audience=ShopEzUsers
+    ports:
+      - "5002:8080"
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+    networks:
+      - shopez-net
+
+  order-service:
+    build: ./OrderService
+    container_name: order-service
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultConnection=Server=sqlserver,1433;User Id=sa;Password=StrongPass@123;Database=ShopEz_Orders;TrustServerCertificate=True
+      - Jwt__Key=9hkfm5q5Mmm/NfwIochtigQrbVOMBsPjw0mhXvbJv0M=
+      - Jwt__Issuer=ShopEz
+      - Jwt__Audience=ShopEzUsers
+      - Services__ProductService=http://product-service:8080
+    ports:
+      - "5003:8080"
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+      product-service:
+        condition: service_started
+    networks:
+      - shopez-net
+
+  cart-service:
+    build: ./CartService
+    container_name: cart-service
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - Jwt__Key=9hkfm5q5Mmm/NfwIochtigQrbVOMBsPjw0mhXvbJv0M=
+      - Jwt__Issuer=ShopEz
+      - Jwt__Audience=ShopEzUsers
+      - Services__ProductService=http://product-service:8080
+    ports:
+      - "5004:8080"
+    depends_on:
+      product-service:
+        condition: service_started
+    networks:
+      - shopez-net
+
+  api-gateway:
+    build: ./ApiGateway
+    container_name: api-gateway
+    ports:
+      - "9090:8080"
+    depends_on:
+      - user-service
+      - product-service
+      - order-service
+      - cart-service
+    networks:
+      - shopez-net
+
+volumes:
+  sqldata:
+
+networks:
+  shopez-net:
+    driver: bridge

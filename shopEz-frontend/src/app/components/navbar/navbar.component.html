@@ -1,0 +1,64 @@
+<nav class="navbar">
+  <div class="nav-container">
+    <a routerLink="/" class="nav-brand">
+      <span class="brand-icon">🛍️</span>
+      <span class="brand-text">ShopEZ</span>
+    </a>
+
+    <div class="nav-links" [class.open]="isMenuOpen">
+      <a
+        routerLink="/"
+        routerLinkActive="active"
+        [routerLinkActiveOptions]="{ exact: true }"
+        (click)="isMenuOpen = false"
+        >Home</a
+      >
+      <a
+        routerLink="/products"
+        routerLinkActive="active"
+        (click)="isMenuOpen = false"
+        >Products</a
+      >
+      <a
+        routerLink="/contact"
+        routerLinkActive="active"
+        (click)="isMenuOpen = false"
+        >Contact Us</a
+      >
+      <a
+        routerLink="/my-orders"
+        routerLinkActive="active"
+        *ngIf="auth.isLoggedIn && !auth.isAdmin"
+        (click)="isMenuOpen = false"
+        >My Orders</a
+      >
+      <a
+        routerLink="/admin"
+        routerLinkActive="active"
+        *ngIf="auth.isAdmin"
+        (click)="isMenuOpen = false"
+        >Admin</a
+      >
+    </div>
+
+    <div class="nav-actions">
+      <a routerLink="/cart" class="cart-btn">
+        🛒
+        <span class="cart-badge" *ngIf="cartCount > 0">{{ cartCount }}</span>
+      </a>
+
+      <ng-container *ngIf="auth.isLoggedIn; else loginBtn">
+        <div class="user-menu">
+          <span class="user-name">{{ auth.currentUser?.name }}</span>
+          <button class="logout-btn" (click)="logout()">Logout</button>
+        </div>
+      </ng-container>
+      <ng-template #loginBtn>
+        <a routerLink="/login" class="login-btn">Login</a>
+        <a routerLink="/register" class="register-btn">Register</a>
+      </ng-template>
+
+      <button class="hamburger" (click)="toggleMenu()">☰</button>
+    </div>
+  </div>
+</nav>

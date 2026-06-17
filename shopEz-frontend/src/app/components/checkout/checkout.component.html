@@ -1,0 +1,125 @@
+<div class="checkout-page">
+  <!-- Order Success -->
+  <div class="order-success" *ngIf="orderPlaced">
+    <div class="success-icon">🎉</div>
+    <h1>Order Placed Successfully!</h1>
+    <p>Thank you for shopping with ShopEZ.</p>
+    <p class="order-id">
+      Order ID: <strong>#{{ orderId }}</strong>
+    </p>
+    <div class="success-actions">
+      <button class="btn-primary" (click)="goShopping()">
+        Continue Shopping
+      </button>
+      <button class="btn-secondary" (click)="goOrders()">View My Orders</button>
+    </div>
+  </div>
+
+  <!-- Checkout Form -->
+  <div *ngIf="!orderPlaced" class="checkout-layout">
+    <div class="form-section">
+      <h1>Checkout</h1>
+      <form [formGroup]="checkoutForm" (ngSubmit)="placeOrder()">
+        <div class="form-group">
+          <label>Full Name</label>
+          <input type="text" formControlName="name" placeholder="Ram" />
+          <span
+            class="err"
+            *ngIf="
+              checkoutForm.get('name')?.invalid &&
+              checkoutForm.get('name')?.touched
+            "
+            >Name is required.</span
+          >
+        </div>
+        <div class="form-group">
+          <label>Email</label>
+          <input
+            type="email"
+            formControlName="email"
+            placeholder="ram@email.com"
+          />
+          <span
+            class="err"
+            *ngIf="
+              checkoutForm.get('email')?.invalid &&
+              checkoutForm.get('email')?.touched
+            "
+            >Valid email is required.</span
+          >
+        </div>
+        <div class="form-group">
+          <label>Street Address</label>
+          <input
+            type="text"
+            formControlName="address"
+            placeholder="Hyderabad"
+          />
+          <span
+            class="err"
+            *ngIf="
+              checkoutForm.get('address')?.invalid &&
+              checkoutForm.get('address')?.touched
+            "
+            >Address is required.</span
+          >
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>City</label>
+            <input type="text" formControlName="city" placeholder="Hyderabad" />
+            <span
+              class="err"
+              *ngIf="
+                checkoutForm.get('city')?.invalid &&
+                checkoutForm.get('city')?.touched
+              "
+              >City is required.</span
+            >
+          </div>
+          <div class="form-group">
+            <label>PIN Code</label>
+            <input
+              type="text"
+              formControlName="pincode"
+              placeholder="500001"
+              maxlength="6"
+            />
+            <span
+              class="err"
+              *ngIf="
+                checkoutForm.get('pincode')?.invalid &&
+                checkoutForm.get('pincode')?.touched
+              "
+              >Valid 6-digit PIN required.</span
+            >
+          </div>
+        </div>
+        <div class="error-msg" *ngIf="errorMsg">⚠️ {{ errorMsg }}</div>
+        <button type="submit" class="place-order-btn" [disabled]="isLoading">
+          {{ isLoading ? "Placing Order..." : "Place Order" }}
+        </button>
+      </form>
+    </div>
+
+    <div class="order-summary">
+      <h2>Your Order</h2>
+      <div class="summary-items">
+        <div class="summary-item" *ngFor="let item of cart.cartItems">
+          <img [src]="item.product.imageUrl" [alt]="item.product.name" />
+          <div class="summary-item-info">
+            <span class="si-name">{{ item.product.name }}</span>
+            <span class="si-qty">Qty: {{ item.quantity }}</span>
+          </div>
+          <span class="si-price"
+            >₹{{ item.product.price * item.quantity | number }}</span
+          >
+        </div>
+      </div>
+      <div class="summary-total">
+        <span>Total</span>
+        <span>₹{{ cart.total | number }}</span>
+      </div>
+    </div>
+  </div>
+</div>

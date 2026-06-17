@@ -1,0 +1,59 @@
+<div class="orders-page">
+  <div class="page-header">
+    <h1>My Orders</h1>
+    <p>Track and view all your past orders</p>
+  </div>
+
+  <div *ngIf="orders.length > 0; else noOrders">
+    <div class="order-card" *ngFor="let order of orders">
+      <div class="order-header" (click)="toggleExpand(order.id!)">
+        <div class="order-meta">
+          <span class="order-id">#{{ order.id }}</span>
+          <span class="order-date">{{
+            order.createdAt | date: "mediumDate"
+          }}</span>
+        </div>
+        <div class="order-info">
+          <span class="order-address">📍 {{ order.address }}</span>
+        </div>
+        <div class="order-right">
+          <span class="order-total">₹{{ order.total | number }}</span>
+          <span class="order-status">{{ order.status }}</span>
+          <span class="toggle-icon">{{
+            expandedOrderId === order.id ? "▲" : "▼"
+          }}</span>
+        </div>
+      </div>
+
+      <div class="order-items" *ngIf="expandedOrderId === order.id">
+        <div class="items-header">Items Ordered</div>
+        <div class="order-item" *ngFor="let item of order.items">
+          <div class="item-details">
+            <span class="item-name">{{
+              item.product.name || "Product #" + item.product.id
+            }}</span>
+            <span class="item-qty">Qty: {{ item.quantity }}</span>
+          </div>
+          <span class="item-price"
+            >₹{{ item.product.price * item.quantity | number }}</span
+          >
+        </div>
+        <div class="order-summary-row">
+          <span>Order Total</span>
+          <strong>₹{{ order.total | number }}</strong>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <ng-template #noOrders>
+    <div class="no-orders">
+      <div class="no-orders-icon">📦</div>
+      <h2>No orders yet</h2>
+      <p>You haven't placed any orders. Start shopping!</p>
+      <button class="shop-btn" (click)="continueShopping()">
+        Browse Products
+      </button>
+    </div>
+  </ng-template>
+</div>

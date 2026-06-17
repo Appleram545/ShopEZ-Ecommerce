@@ -1,0 +1,127 @@
+<div class="product-page">
+  <div class="page-header">
+    <h1>Our Products</h1>
+    <p>
+      Discover {{ filteredProducts.length }} amazing products at great prices
+    </p>
+  </div>
+
+  <div class="filters">
+    <div class="search-box">
+      <input
+        type="text"
+        placeholder="Search products..."
+        [(ngModel)]="searchTerm"
+        (input)="onSearch()"
+        class="search-input"
+      />
+      <span class="search-icon">🔍</span>
+    </div>
+    <div class="category-tabs">
+      <button
+        *ngFor="let cat of categories"
+        [class.active]="selectedCategory === cat"
+        (click)="selectCategory(cat)"
+        class="cat-btn"
+      >
+        {{ cat }}
+      </button>
+    </div>
+  </div>
+
+  <div class="results-info">
+    Showing {{ (currentPage - 1) * 12 + 1 }}–{{
+      Math.min(currentPage * 12, filteredProducts.length)
+    }}
+    of {{ filteredProducts.length }} products
+  </div>
+
+  <div class="products-grid" *ngIf="pagedProducts.length > 0; else noProducts">
+    <div class="product-card" *ngFor="let product of pagedProducts">
+      <div class="product-img-wrap" (click)="viewDetails(product.id)">
+        <img
+          [src]="product.imageUrl"
+          [alt]="product.name"
+          class="product-img"
+          loading="lazy"
+        />
+        <span class="product-category">{{ product.category }}</span>
+        <span class="out-of-stock-overlay" *ngIf="product.stock === 0"
+          >Out of Stock</span
+        >
+      </div>
+      <div class="product-info">
+        <h3 class="product-name" (click)="viewDetails(product.id)">
+          {{ product.name }}
+        </h3>
+        <p class="product-desc">{{ product.desc | slice: 0 : 75 }}...</p>
+        <div class="product-footer">
+          <span class="product-price">₹{{ product.price | number }}</span>
+          <span
+            class="stock-badge"
+            [class.low]="product.stock > 0 && product.stock < 5"
+            [class.out]="product.stock === 0"
+          >
+            {{
+              product.stock === 0
+                ? "Out of Stock"
+                : product.stock < 5
+                  ? "Only " + product.stock + " left"
+                  : "In Stock"
+            }}
+          </span>
+        </div>
+        <button
+          class="add-to-cart-btn"
+          [class.added]="addedProductId === product.id"
+          (click)="addToCart(product)"
+          [disabled]="product.stock === 0"
+        >
+          {{ addedProductId === product.id ? "✓ Added!" : "🛒 Add to Cart" }}
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pagination -->
+  <div class="pagination" *ngIf="totalPages > 1">
+    <button
+      class="page-btn nav"
+      (click)="setPage(currentPage - 1)"
+      [disabled]="currentPage === 1"
+    >
+      ‹ Prev
+    </button>
+    <ng-container *ngFor="let p of getVisiblePages()">
+      <span *ngIf="p === -1" class="page-dots">...</span>
+      <button
+        *ngIf="p !== -1"
+        class="page-btn"
+        [class.active]="p === currentPage"
+        (click)="setPage(p)"
+      >
+        {{ p }}
+      </button>
+    </ng-container>
+    <button
+      class="page-btn nav"
+      (click)="setPage(currentPage + 1)"
+      [disabled]="currentPage === totalPages"
+    >
+      Next ›
+    </button>
+  </div>
+
+  <ng-template #noProducts>
+    <div class="no-products">
+      <div class="no-products-icon">😕</div>
+      <p>No products found. Try a different search or category.</p>
+      <button
+        class="reset-btn"
+        (click)="searchTerm = ''; selectedCategory = 'All'; applyFilters()"
+      >
+        Clear Filters
+      </button>
+    </div>
+  </ng-template>
+</div>

@@ -1,0 +1,199 @@
+<div class="admin-page">
+  <div class="admin-header">
+    <h1>Admin Dashboard</h1>
+    <div class="success-toast" *ngIf="successMsg">✅ {{ successMsg }}</div>
+  </div>
+
+  <div class="admin-tabs">
+    <button
+      [class.active]="activeTab === 'products'"
+      (click)="activeTab = 'products'"
+    >
+      Products
+    </button>
+    <button
+      [class.active]="activeTab === 'orders'"
+      (click)="activeTab = 'orders'"
+    >
+      Orders
+    </button>
+  </div>
+
+  <!-- Products Tab -->
+  <div *ngIf="activeTab === 'products'">
+    <div class="tab-toolbar">
+      <h2>Manage Products ({{ products.length }})</h2>
+      <button class="add-btn" (click)="openAddForm()">+ Add Product</button>
+    </div>
+
+    <!-- Product Form Modal -->
+    <div class="modal-overlay" *ngIf="showForm" (click)="cancelForm()">
+      <div class="modal" (click)="$event.stopPropagation()">
+        <h3>{{ editingProduct ? "Edit Product" : "Add New Product" }}</h3>
+        <form [formGroup]="productForm" (ngSubmit)="submitForm()">
+          <div class="form-group">
+            <label>Product Name</label>
+            <input formControlName="name" placeholder="Product name" />
+            <span
+              class="err"
+              *ngIf="
+                productForm.get('name')?.invalid &&
+                productForm.get('name')?.touched
+              "
+              >Required</span
+            >
+          </div>
+          <div class="form-group">
+            <label>Description</label>
+            <textarea
+              formControlName="description"
+              placeholder="Product description"
+              rows="3"
+            ></textarea>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Price (₹)</label>
+              <input type="number" formControlName="price" placeholder="0" />
+            </div>
+            <div class="form-group">
+              <label>Stock</label>
+              <input type="number" formControlName="stock" placeholder="0" />
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Category</label>
+            <select formControlName="category">
+              <option value="">Select...</option>
+              <option>Headphones</option>
+              <option>Smartphones</option>
+              <option>Laptops</option>
+              <option>Tablets</option>
+              <option>Smartwatches</option>
+              <option>Cameras</option>
+              <option>Gaming</option>
+              <option>Monitors</option>
+              <option>Speakers</option>
+              <option>Accessories</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Image URL</label>
+            <input formControlName="imageUrl" placeholder="https://..." />
+          </div>
+          <div class="modal-actions">
+           <button
+  type="button"
+  class="save-btn"
+  (click)="submitForm()"
+>
+  {{ editingProduct ? "Update" : "Add" }} Product
+</button>
+            <button type="button" class="cancel-btn" (click)="cancelForm()">
+              Cancel
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Products Table -->
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Image</th>
+            <th>Name</th>
+            <th>Category</th>
+            <th>Price</th>
+            <th>Stock</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let p of products">
+            <td><img [src]="p.imageUrl" [alt]="p.name" class="table-img" /></td>
+            <td>
+              <strong>{{ p.name }}</strong>
+            </td>
+            <td>
+              <span class="badge">{{ p.category }}</span>
+            </td>
+            <td>₹{{ p.price | number }}</td>
+            <td [class.low-stock]="p.stock < 5">{{ p.stock }}</td>
+            <td>
+              <div class="actions-cell">
+                <button class="edit-btn" (click)="openEditForm(p)">
+                  ✏️ Edit
+                </button>
+                <button class="del-btn" (click)="deleteProduct(p.id)">
+                  🗑️ Delete
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Orders Tab -->
+  <div *ngIf="activeTab === 'orders'">
+    <div class="tab-toolbar">
+      <h2>All Orders ({{ orders.length }})</h2>
+    </div>
+
+    <div class="empty-orders" *ngIf="orders.length === 0">
+      <p>No orders yet.</p>
+    </div>
+
+    <div class="table-wrap" *ngIf="orders.length > 0">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Order ID</th>
+            <th>User ID</th>
+            <th>Total</th>
+            <th>Items</th>
+            <th>Date</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr
+            *ngFor="let o of orders"
+            (click)="toggleOrder(o.id)"
+            class="order-row"
+          >
+            <td>
+              <strong>#{{ o.id }}</strong>
+            </td>
+            <td>User #{{ o.userId }}</td>
+            <td>
+              <strong>₹{{ o.total | number }}</strong>
+            </td>
+            <td>{{ o.items?.length || 0 }} item(s)</td>
+            <td>
+              {{ o.date | date: "dd MMM yyyy, hh:mm a" : "Asia/Kolkata" }}
+            </td>
+          </tr>
+          <!-- Expanded order items -->
+          <ng-container *ngFor="let o of orders">
+            <tr *ngIf="expandedOrderId === o.id" class="expanded-row">
+              <td colspan="5">
+                <div class="order-items-detail">
+                  <strong>Order Items:</strong>
+                  <div class="item-row" *ngFor="let item of o.items">
+                    <span>Product ID: {{ item.productId }}</span>
+                    <span>Qty: {{ item.qty }}</span>
+                    <span>Price: ₹{{ item.price | number }}</span>
+                    <span>Subtotal: ₹{{ item.qty * item.price | number }}</span>
+                  </div>
+                </div>
+              </td>
+            </tr>
+          </ng-container>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

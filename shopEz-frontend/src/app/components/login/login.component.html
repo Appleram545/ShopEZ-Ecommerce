@@ -1,0 +1,54 @@
+<div class="auth-page">
+  <div class="auth-card">
+    <div class="auth-brand">🛍️ ShopEZ</div>
+    <h2>Welcome Back</h2>
+    <p class="auth-sub">Sign in to your account</p>
+
+    <div class="demo-pills">
+    
+      
+    </div>
+
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+      <div class="form-group">
+        <label>Email</label>
+        <input
+          type="email"
+          formControlName="email"
+          placeholder="ram@email.com"
+        />
+        <span
+          class="err"
+          *ngIf="
+            loginForm.get('email')?.invalid && loginForm.get('email')?.touched
+          "
+          >Valid email required.</span
+        >
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input
+          type="password"
+          formControlName="password"
+          placeholder="••••••••"
+        />
+        <span
+          class="err"
+          *ngIf="
+            loginForm.get('password')?.invalid &&
+            loginForm.get('password')?.touched
+          "
+          >Password required.</span
+        >
+      </div>
+      <div class="err" *ngIf="error">{{ error }}</div>
+      <button type="submit" class="auth-btn" [disabled]="loading">
+        {{ loading ? "Signing in..." : "Sign In" }}
+      </button>
+    </form>
+
+    <p class="auth-link">
+      Don't have an account? <a routerLink="/register">Register</a>
+    </p>
+  </div>
+</div>

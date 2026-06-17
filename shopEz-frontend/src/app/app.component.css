@@ -1,0 +1,19 @@
+.main-content {
+  min-height: calc(100vh - 64px - 56px);
+}
+.footer {
+  background: #1a1a2e;
+  color: #888;
+  padding: 1rem 2rem;
+  font-size: 0.85rem;
+}
+.footer-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.footer strong {
+  color: #e94560;
+}
